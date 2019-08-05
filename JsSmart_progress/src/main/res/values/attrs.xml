@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="JSProgressBar">
+        <attr name="js_pb_degree" format="integer|reference" />
+        <attr name="js_pb_stroke_width" format="dimension|reference" />
+        <attr name="js_pb_button_width" format="dimension|reference" />
+        <attr name="js_pb_offset_top" format="dimension|reference" />
+        <attr name="js_pb_max" format="integer|reference" />
+        <attr name="js_pb_progress" format="integer|reference" />
+        <attr name="js_pb_steps" format="string|reference" />
+        <attr name="js_pb_step_line_length" format="dimension|reference" />
+        <attr name="js_pb_step_line_width" format="dimension|reference" />
+        <attr name="js_pb_step_line_offset" format="dimension|reference" />
+        <attr name="js_pb_drag" format="boolean|reference" />
+        <attr name="js_pb_colors" format="string|reference" />
+        <attr name="js_pb_background_colors" format="string|reference" />
+        <attr name="js_pb_text_colors" format="string|reference" />
+        <attr name="js_pb_text_size" format="dimension|reference" />
+        <attr name="js_pb_text_hint" format="string|reference" />
+        <attr name="js_pb_text_hint_size" format="dimension|reference" />
+        <attr name="js_pb_color_light" format="boolean|reference" />
+        <attr name="js_pb_round" format="boolean|reference" />
+    </declare-styleable>
+
+</resources>
