@@ -737,4 +737,12 @@ public class JSProgressBar extends View {
     public float getProgress() {
         return progress;
     }
+
+    public JSProgressListener getProgressListener() {
+        return progressListener;
+    }
+
+    public void setProgressListener(JSProgressListener progressListener) {
+        this.progressListener = progressListener;
+    }
 }
