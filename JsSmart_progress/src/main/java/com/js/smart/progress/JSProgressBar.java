@@ -22,6 +22,8 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.math.BigDecimal;
+
 public class JSProgressBar extends View {
 
     /**
@@ -45,6 +47,10 @@ public class JSProgressBar extends View {
      */
     private float max, progress;
     /**
+     * 当前分段进度
+     */
+    private Float step;
+    /**
      * 分段精度值
      */
     private float[] steps;
@@ -52,6 +58,18 @@ public class JSProgressBar extends View {
      * 分段进度
      */
     private float stepProgress;
+    /**
+     * 分段进度显示首尾
+     */
+    private boolean stepShowStart;
+    /**
+     * 分段进度显示文字
+     */
+    private boolean stepShowText;
+    /**
+     * 分段进度提示文字大小
+     */
+    private float stepTextSize;
     /**
      * 分段的刻度长
      */
@@ -101,6 +119,10 @@ public class JSProgressBar extends View {
      * 进度条颜色梯度
      */
     private float[] progressBackgroundGradient = new float[0];
+    /**
+     * 进度条文字显示类型
+     */
+    private int textType;
     /**
      * 进度条文字颜色
      */
@@ -202,6 +224,9 @@ public class JSProgressBar extends View {
         STEP_LINE_LENGTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_line_length, 0);
         STEP_LINE_WIDTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_line_width, 0);
         STEP_LINE_OFFSET = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_line_offset, 0);
+        stepShowStart = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_step_show_start, false);
+        stepShowText = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_step_show_text, true);
+        stepTextSize = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_text_size, 0);
         draggingEnabled = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_drag, false);
         String colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_colors);
         if (!TextUtils.isEmpty(colors)) {
@@ -229,6 +254,8 @@ public class JSProgressBar extends View {
         if (TextUtils.isEmpty(progressTextHint))
             progressTextHint = "";
         progressTextHintSize = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_text_hint_size, 0);
+
+        textType = typedArray.getInt(R.styleable.JSProgressBar_js_pb_text_type, 1);
 
         lastDegree = ARC_FULL_DEGREE * (progress / max);
         ARC_FULL_DEGREE = ARC_FULL_DEGREE >= 360 ? 359 : ARC_FULL_DEGREE;
@@ -286,7 +313,7 @@ public class JSProgressBar extends View {
 
         if (progressBackgroundColors.length != 0)
             if (progressBackgroundColors.length > 2) {
-                LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height+ OFFSET_TOP,
+                LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressBackgroundColors, progressBackgroundGradient, Shader.TileMode.REPEAT);
 
                 stepProgressPaint.setShader(gradient);
@@ -336,7 +363,7 @@ public class JSProgressBar extends View {
             circleRadius -= BUTTON_WIDTH > STROKE_WIDTH ? BUTTON_WIDTH : STROKE_WIDTH;
 
             centerX = width / 2;
-            centerY = height / 2 +OFFSET_TOP;
+            centerY = height / 2 + OFFSET_TOP;
 
             //圆弧所在矩形区域
             circleRectF = new RectF();
@@ -344,6 +371,13 @@ public class JSProgressBar extends View {
             circleRectF.top = centerY - circleRadius;
             circleRectF.right = centerX + circleRadius;
             circleRectF.bottom = centerY + circleRadius;
+            if (ARC_FULL_DEGREE <= 180) {
+                centerY += height / 4;
+                circleRectF.top = centerY - circleRadius - circleRadius / 2;
+                circleRectF.bottom = centerY + circleRadius + circleRadius / 2;
+                circleRectF.right = centerX + circleRadius + circleRadius / 2;
+                circleRectF.left = centerX - circleRadius - circleRadius / 2;
+            }
 
             init();
         }
@@ -368,33 +402,68 @@ public class JSProgressBar extends View {
         //绘制分段
         if (steps.length > 0) {
             float drawDegree = ARC_FULL_DEGREE * 1.0f / (steps.length);
-            while (drawDegree < ARC_FULL_DEGREE) {
-                double a = (180 - ARC_FULL_DEGREE /2  + drawDegree) / 180 * Math.PI;
-                float lineStartX = centerX - (circleRadius -STEP_LINE_OFFSET) * (float) Math.sin(a);
-                float lineStartY = centerY + (circleRadius -STEP_LINE_OFFSET) * (float) Math.cos(a);
+            if (stepShowStart)
+                drawDegree = 0;
+            while (drawDegree < ARC_FULL_DEGREE || (stepShowStart && drawDegree == ARC_FULL_DEGREE)) {
+                double a = (180 - ARC_FULL_DEGREE / 2 + drawDegree) / 180 * Math.PI;
+                float lineStartX = centerX - (circleRadius - STEP_LINE_OFFSET) * (float) Math.sin(a);
+                float lineStartY = centerY + (circleRadius - STEP_LINE_OFFSET) * (float) Math.cos(a);
+                if (ARC_FULL_DEGREE <= 180) {
+                    lineStartX = centerX - (circleRadius + circleRadius / 2 - STEP_LINE_OFFSET) * (float) Math.sin(a);
+                    lineStartY = centerY + (circleRadius + circleRadius / 2 - STEP_LINE_OFFSET) * (float) Math.cos(a);
+                }
                 float lineStopX = lineStartX + STEP_LINE_LENGTH * (float) Math.sin(a);
                 float lineStopY = lineStartY - STEP_LINE_LENGTH * (float) Math.cos(a);
 
                 canvas.drawLine(lineStartX, lineStartY, lineStopX, lineStopY, stepProgressPaint);
 
+                if (stepShowText) {
+                    float step = drawDegree;
+                    if (drawDegree != 0)
+                        step = steps[steps.length - (int) (ARC_FULL_DEGREE / drawDegree)];
+                    String text = String.valueOf(step);
+                    textPaint.setTextSize(stepTextSize == 0 ? circleRadius / 8 : stepTextSize);
+                    float textLen = textPaint.measureText(text);
+                    textPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
+                    float h1 = textBounds.height();
+                    if (drawDegree == 0) {
+                        canvas.drawText(text, lineStopX + textLen / 2, lineStopY + h1 / 2, textPaint);
+                    } else if (drawDegree == 180) {
+                        canvas.drawText(text, lineStopX - textLen - textLen / 2, lineStopY + h1 / 2, textPaint);
+                    } else if (drawDegree < 90) {
+                        canvas.drawText(text, lineStopX, lineStopY + h1 * 2, textPaint);
+                    } else if (drawDegree > 90) {
+                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 * 2, textPaint);
+                    } else {
+                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1* 2, textPaint);
+                    }
+                }
+
                 drawDegree += ARC_FULL_DEGREE * 1.0f / (steps.length);
             }
         }
 
+
         //上一行文字
         textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 1 : progressTextSize);
         String text = (int) (100 * progress / max) + "";
+        if (textType == 2) {
+            text = step != null ? String.valueOf(step) : String.valueOf(progress);
+        }
         float textLen = textPaint.measureText(text);
         //计算文字高度
         textPaint.getTextBounds("8", 0, 1, textBounds);
         float h1 = textBounds.height();
         //% 前面的数字水平居中，适当调整
         float extra = text.startsWith("1") ? -textPaint.measureText("1") / 2 : 0;
-        canvas.drawText(text, centerX - textLen / 2 + extra, centerY - 30 + h1 / 2, textPaint);
-
-        //百分号
-        textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 2 : progressTextSize);
-        canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - 30 + h1 / 2, textPaint);
+        if (textType == 1 || textType == 2) {
+            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - 30 + h1 / 2, textPaint);
+        }
+        if (textType == 1) {
+            //百分号
+            textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 2 : progressTextSize);
+            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - 30 + h1 / 2, textPaint);
+        }
 
         //下一行文字
         textPaint.setTextSize(progressTextHintSize == 0 ? circleRadius / 5 : progressTextHintSize);
@@ -408,6 +477,10 @@ public class JSProgressBar extends View {
             float progressRadians = (float) (((360.0f - ARC_FULL_DEGREE) / 2 + sweep1) / 180 * Math.PI);
             float thumbX = centerX - circleRadius * (float) Math.sin(progressRadians);
             float thumbY = centerY + circleRadius * (float) Math.cos(progressRadians);
+            if (ARC_FULL_DEGREE <= 180) {
+                thumbX = centerX - (circleRadius + circleRadius / 2) * (float) Math.sin(progressRadians);
+                thumbY = centerY + (circleRadius + circleRadius / 2) * (float) Math.cos(progressRadians);
+            }
             thumbPaint.setColor(getThumbColor(33));
             canvas.drawCircle(thumbX, thumbY, BUTTON_WIDTH == 0 ? STROKE_WIDTH * 2.0f : BUTTON_WIDTH * 1.0f, thumbPaint);
             thumbPaint.setColor(getThumbColor(99));
@@ -514,7 +587,7 @@ public class JSProgressBar extends View {
     private float[] stringToGradient(String str) {
         String[] list = str.split(",");
         float[] result = new float[list.length];
-        float degree = ARC_FULL_DEGREE  /(list.length -1);
+        float degree = ARC_FULL_DEGREE / (list.length - 1);
         for (int i = 0; i < list.length; i++) {
             result[i] = degree * i / 360f;
         }
@@ -530,7 +603,10 @@ public class JSProgressBar extends View {
     private boolean checkOnArc(float currentX, float currentY) {
         float distance = calDistance(currentX, currentY, centerX, centerY);
         float degree = calDegreeByPosition(currentX, currentY);
-        return distance > circleRadius - STROKE_WIDTH * 5 && distance < circleRadius + STROKE_WIDTH * 5
+        float radius = circleRadius;
+        if (ARC_FULL_DEGREE <= 180)
+            radius = circleRadius + circleRadius / 2;
+        return distance > radius - STROKE_WIDTH * 5 && distance < radius + STROKE_WIDTH * 5
                 && (degree >= -8 && degree <= ARC_FULL_DEGREE + 8);
     }
 
@@ -564,7 +640,7 @@ public class JSProgressBar extends View {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                progress = (float) animation.getAnimatedValue();
+                progress = new BigDecimal((float) animation.getAnimatedValue()).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
                 invalidate();
             }
         });
@@ -590,12 +666,13 @@ public class JSProgressBar extends View {
 
     //设置进度
     public void setProgressSync(float progress) {
-        this.progress = checkProgress(progress);
+        this.progress = new BigDecimal(checkProgress(progress)).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
         invalidate();
     }
 
     //设置分段进度
     public float setProgressStep(float step) {
+        this.step = step;
         float progress = 0;
         for (int i = 0; i < steps.length; i++) {
             if (step <= steps[i]) {

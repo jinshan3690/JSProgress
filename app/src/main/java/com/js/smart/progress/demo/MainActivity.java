@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
                 step --;
                 pb1.setProgressStep(step);
                 pb2.setProgressStep(step);
-                pb3.setProgressStep(step);
+                pb3.setProgress(step);
                 pb4.setProgressStep(step);
 
             }
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 step ++;
                 pb1.setProgressStep(step);
                 pb2.setProgressStep(step);
-                pb3.setProgressStep(step);
+                pb3.setProgress(step);
                 pb4.setProgressStep(step);
             }
         });
