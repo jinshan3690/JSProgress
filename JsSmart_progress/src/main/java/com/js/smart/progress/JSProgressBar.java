@@ -457,13 +457,17 @@ public class JSProgressBar extends View {
         float h1 = textBounds.height();
         //% 前面的数字水平居中，适当调整
         float extra = text.startsWith("1") ? -textPaint.measureText("1") / 2 : 0;
+        float offset = 0;
+        if (ARC_FULL_DEGREE <= 180) {
+            offset =  h1;
+        }
         if (textType == 1 || textType == 2) {
-            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - 30 + h1 / 2, textPaint);
+            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - 30 + h1 / 2 - offset, textPaint);
         }
         if (textType == 1) {
             //百分号
             textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 2 : progressTextSize);
-            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - 30 + h1 / 2, textPaint);
+            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - 30 + h1 / 2 - offset, textPaint);
         }
 
         //下一行文字
@@ -471,7 +475,11 @@ public class JSProgressBar extends View {
         textLen = textPaint.measureText(progressTextHint);
         textPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
         float h2 = textBounds.height();
-        canvas.drawText(progressTextHint, centerX - textLen / 2, centerY + h1 / 2 + h2, textPaint);
+
+        if (ARC_FULL_DEGREE <= 180) {
+            offset = h1 / 2 + h2/2;
+        }
+        canvas.drawText(progressTextHint, centerX - textLen / 2, centerY + h1 / 2 + h2 - offset, textPaint);
 
         //绘制进度位置，也可以直接替换成一张图片
         if (draggingEnabled) {
