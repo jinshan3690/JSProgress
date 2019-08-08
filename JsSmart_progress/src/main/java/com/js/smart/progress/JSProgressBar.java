@@ -404,7 +404,7 @@ public class JSProgressBar extends View {
             float drawDegree = ARC_FULL_DEGREE * 1.0f / (steps.length);
             if (stepShowStart)
                 drawDegree = 0;
-            while (drawDegree < ARC_FULL_DEGREE || (stepShowStart && drawDegree == ARC_FULL_DEGREE)) {
+            for (int i = 0; i < (stepShowStart ? steps.length + 1 : steps.length - 1); i++) {
                 double a = (180 - ARC_FULL_DEGREE / 2 + drawDegree) / 180 * Math.PI;
                 float lineStartX = centerX - (circleRadius - STEP_LINE_OFFSET) * (float) Math.sin(a);
                 float lineStartY = centerY + (circleRadius - STEP_LINE_OFFSET) * (float) Math.cos(a);
@@ -420,7 +420,7 @@ public class JSProgressBar extends View {
                 if (stepShowText) {
                     float step = drawDegree;
                     if (drawDegree != 0)
-                        step = steps[steps.length - (int) (ARC_FULL_DEGREE / drawDegree)];
+                        step = steps[stepShowStart ? i - 1 : i];
                     String text = String.valueOf(step);
                     textPaint.setTextSize(stepTextSize == 0 ? circleRadius / 8 : stepTextSize);
                     float textLen = textPaint.measureText(text);
@@ -428,14 +428,14 @@ public class JSProgressBar extends View {
                     float h1 = textBounds.height();
                     if (drawDegree == 0) {
                         canvas.drawText(text, lineStopX + textLen / 2, lineStopY + h1 / 2, textPaint);
-                    } else if (drawDegree == 180) {
+                    } else if (drawDegree == ARC_FULL_DEGREE) {
                         canvas.drawText(text, lineStopX - textLen - textLen / 2, lineStopY + h1 / 2, textPaint);
-                    } else if (drawDegree < 90) {
-                        canvas.drawText(text, lineStopX, lineStopY + h1 * 2, textPaint);
-                    } else if (drawDegree > 90) {
-                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 * 2, textPaint);
+                    } else if (drawDegree < ARC_FULL_DEGREE / 2) {
+                        canvas.drawText(text, lineStopX, lineStopY + h1 + h1 / 2, textPaint);
+                    } else if (drawDegree > ARC_FULL_DEGREE / 2) {
+                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 + h1 / 2, textPaint);
                     } else {
-                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1* 2, textPaint);
+                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1 + h1 / 2, textPaint);
                     }
                 }
 
