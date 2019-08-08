@@ -433,9 +433,9 @@ public class JSProgressBar extends View {
                     if (drawDegree != 0)
                         step = steps[stepShowStart ? i - 1 : i];
                     String text = new DecimalFormat("###.####").format(step);
-                    textPaint.setTextSize(stepTextSize == 0 ? circleRadius / 8 : stepTextSize);
+                    textStepPaint.setTextSize(stepTextSize == 0 ? circleRadius / 8 : stepTextSize);
                     float textLen = textPaint.measureText(text);
-                    textPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
+                    textStepPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
                     float h1 = textBounds.height();
                     if (drawDegree == 0) {
                         canvas.drawText(text, lineStopX + textLen / 2, lineStopY + h1 / 2, textStepPaint);
@@ -472,12 +472,12 @@ public class JSProgressBar extends View {
             offset =  h1;
         }
         if (textType == 1 || textType == 2) {
-            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - circleRadius/8 + h1 / 2 - offset, textPaint);
+            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - circleRadius/10 + h1 / 2 - offset, textPaint);
         }
         if (textType == 1) {
             //百分号
             textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 2 : progressTextSize);
-            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - circleRadius/8 + h1 / 2 - offset, textPaint);
+            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - circleRadius/10 + h1 / 2 - offset, textPaint);
         }
 
         //下一行文字
