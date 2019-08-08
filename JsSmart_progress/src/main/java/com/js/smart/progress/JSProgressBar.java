@@ -202,6 +202,8 @@ public class JSProgressBar extends View {
      */
     private boolean isDragging = false;
 
+    private JSProgressListener progressListener;
+
 
     public JSProgressBar(Context context) {
         this(context, null);
@@ -532,6 +534,8 @@ public class JSProgressBar extends View {
                     float newProgress = calDegreeByPosition(currentX, currentY) / ARC_FULL_DEGREE * max;
                     setProgressSync(newProgress);
                     isDragging = true;
+                    if (progressListener != null)
+                        progressListener.dragging(progress, step);
                 }
                 break;
 
@@ -547,6 +551,8 @@ public class JSProgressBar extends View {
                         } else {
                             setProgressSync(Math.round(lastDegree / ARC_FULL_DEGREE) >= 1 ? 359 * max : 0);
                         }
+                        if (progressListener != null)
+                            progressListener.dragging(progress, step);
                     } else {//取消状态
 //                        isDragging = false;
                     }
@@ -560,6 +566,10 @@ public class JSProgressBar extends View {
         }
 
         return true;
+    }
+
+    public interface JSProgressListener{
+        void dragging(float progress, float step);
     }
 
     /**
