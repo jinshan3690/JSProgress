@@ -1,5 +1,6 @@
 package com.js.smart.progress;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -568,8 +569,11 @@ public class JSProgressBar extends View {
                         step = getProgressStep(newProgress);
                     setProgressSync(newProgress);
                     isDragging = true;
+                    if (valueAnimator != null && valueAnimator.isStarted()) {
+                        valueAnimator.cancel();
+                    }
                     if (progressListener != null)
-                        progressListener.dragging(progress, step);
+                        progressListener.dragging(progress, step == null ? 0f : step);
                 }
                 break;
 
@@ -590,7 +594,7 @@ public class JSProgressBar extends View {
                         if (steps.length > 0)
                             step = getProgressStep(newProgress);
                         if (progressListener != null)
-                            progressListener.dragging(progress, step);
+                            progressListener.dragging(progress, step == null ? 0f : step);
                     } else {//取消状态
 //                        isDragging = false;
                     }
@@ -699,10 +703,15 @@ public class JSProgressBar extends View {
         return progress > max ? max : progress;
     }
 
+    private ValueAnimator valueAnimator;
+
     //动画效果
-    private void startAnimation(float per) {
+    private void startAnimation(final float per) {
+        if (valueAnimator != null && valueAnimator.isStarted()) {
+            valueAnimator.cancel();
+        }
         float diff = per - progress;
-        ValueAnimator valueAnimator = ValueAnimator
+        valueAnimator = ValueAnimator
                 .ofFloat(progress, progress + diff)
                 .setDuration(1000);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
