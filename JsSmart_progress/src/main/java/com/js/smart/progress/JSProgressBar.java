@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 public class JSProgressBar extends View {
 
@@ -421,7 +422,7 @@ public class JSProgressBar extends View {
                     float step = drawDegree;
                     if (drawDegree != 0)
                         step = steps[stepShowStart ? i - 1 : i];
-                    String text = String.valueOf(step);
+                    String text = new DecimalFormat("###.####").format(step);
                     textPaint.setTextSize(stepTextSize == 0 ? circleRadius / 8 : stepTextSize);
                     float textLen = textPaint.measureText(text);
                     textPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
