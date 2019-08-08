@@ -182,6 +182,10 @@ public class JSProgressBar extends View {
      */
     private Paint textPaint;
     /**
+     * 绘制分段的画笔
+     */
+    private Paint textStepPaint;
+    /**
      * 绘制当前进度值的画笔
      */
     private Paint thumbPaint;
@@ -295,6 +299,10 @@ public class JSProgressBar extends View {
         textPaint = new Paint();
         textPaint.setAntiAlias(true);
 
+        //分段文字画笔
+        textStepPaint = new Paint();
+        textStepPaint.setAntiAlias(true);
+
         //按钮画笔
         thumbPaint = new Paint();
         thumbPaint.setAntiAlias(true);
@@ -319,9 +327,11 @@ public class JSProgressBar extends View {
 
                 stepProgressPaint.setShader(gradient);
                 progressBackgroundPaint.setShader(gradient);
+                textStepPaint.setShader(gradient);
             } else {
                 stepProgressPaint.setColor(progressBackgroundColors[0]);
                 progressBackgroundPaint.setColor(progressBackgroundColors[0]);
+                textStepPaint.setColor(progressBackgroundColors[0]);
             }
 
         if (progressTextColors.length != 0) {
@@ -428,15 +438,15 @@ public class JSProgressBar extends View {
                     textPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
                     float h1 = textBounds.height();
                     if (drawDegree == 0) {
-                        canvas.drawText(text, lineStopX + textLen / 2, lineStopY + h1 / 2, textPaint);
+                        canvas.drawText(text, lineStopX + textLen / 2, lineStopY + h1 / 2, textStepPaint);
                     } else if (drawDegree == ARC_FULL_DEGREE) {
-                        canvas.drawText(text, lineStopX - textLen - textLen / 2, lineStopY + h1 / 2, textPaint);
+                        canvas.drawText(text, lineStopX - textLen - textLen / 2, lineStopY + h1 / 2, textStepPaint);
                     } else if (drawDegree < ARC_FULL_DEGREE / 2) {
-                        canvas.drawText(text, lineStopX, lineStopY + h1 + h1 / 2, textPaint);
+                        canvas.drawText(text, lineStopX, lineStopY + h1 + h1 / 2, textStepPaint);
                     } else if (drawDegree > ARC_FULL_DEGREE / 2) {
-                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 + h1 / 2, textPaint);
+                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 + h1 / 2, textStepPaint);
                     } else {
-                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1 + h1 / 2, textPaint);
+                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1 + h1 / 2, textStepPaint);
                     }
                 }
 
@@ -462,12 +472,12 @@ public class JSProgressBar extends View {
             offset =  h1;
         }
         if (textType == 1 || textType == 2) {
-            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - 30 + h1 / 2 - offset, textPaint);
+            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - circleRadius/8 + h1 / 2 - offset, textPaint);
         }
         if (textType == 1) {
             //百分号
             textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 2 : progressTextSize);
-            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - 30 + h1 / 2 - offset, textPaint);
+            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - circleRadius/8 + h1 / 2 - offset, textPaint);
         }
 
         //下一行文字
