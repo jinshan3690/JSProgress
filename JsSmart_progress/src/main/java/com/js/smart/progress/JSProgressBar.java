@@ -633,9 +633,10 @@ public class JSProgressBar extends View {
         float distance = calDistance(currentX, currentY, centerX, centerY);
         float degree = calDegreeByPosition(currentX, currentY);
         float radius = circleRadius;
+        float width = (STROKE_WIDTH > BUTTON_WIDTH ?STROKE_WIDTH * 10:BUTTON_WIDTH *2);
         if (ARC_FULL_DEGREE <= 180)
             radius = circleRadius + circleRadius / 2;
-        return distance > radius - STROKE_WIDTH * 5 && distance < radius + STROKE_WIDTH * 5
+        return distance > radius - width && distance < radius + width
                 && (degree >= -8 && degree <= ARC_FULL_DEGREE + 8);
     }
 
