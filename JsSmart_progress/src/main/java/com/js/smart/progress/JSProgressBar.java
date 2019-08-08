@@ -758,6 +758,25 @@ public class JSProgressBar extends View {
         return progress;
     }
 
+    public float setProgressStepSync(float step) {
+        this.step = step;
+        float progress = 0;
+        for (int i = 0; i < steps.length; i++) {
+            if (step <= steps[i]) {
+                if (i == 0) {
+                    progress = stepProgress * i + stepProgress * (step / steps[i]);
+                } else {
+                    progress = stepProgress * i + stepProgress * ((step - steps[i - 1]) / (steps[i] - steps[i - 1]));
+                }
+                break;
+            } else {
+                progress = max;
+            }
+        }
+        setProgressSync(progress);
+        return progress;
+    }
+
     private float getProgressStep(float progress) {
         float diff;
         int count = 0;
