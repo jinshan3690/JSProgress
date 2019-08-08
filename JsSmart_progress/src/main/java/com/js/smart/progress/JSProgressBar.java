@@ -72,6 +72,18 @@ public class JSProgressBar extends View {
      */
     private float stepTextSize;
     /**
+     * 进度条颜色
+     */
+    private String[] stepTextColorsStr = new String[0];
+    /**
+     * 进度条颜色
+     */
+    private int[] stepTextColors = new int[0];
+    /**
+     * 进度条颜色梯度
+     */
+    private float[] stepTextGradient = new float[0];
+    /**
      * 分段的刻度长
      */
     private float STEP_LINE_LENGTH;
@@ -228,14 +240,22 @@ public class JSProgressBar extends View {
         progress = typedArray.getInteger(R.styleable.JSProgressBar_js_pb_progress, 0);
         String step = typedArray.getString(R.styleable.JSProgressBar_js_pb_steps);
         steps = stringToFloatArray(step);
+        if (steps.length > 0)
+            max = steps[steps.length - 1];
         STEP_LINE_LENGTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_line_length, 0);
         STEP_LINE_WIDTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_line_width, 0);
         STEP_LINE_OFFSET = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_line_offset, 0);
         stepShowStart = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_step_show_start, false);
         stepShowText = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_step_show_text, true);
         stepTextSize = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_text_size, 0);
+        String colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_step_text_colors);
+        if (!TextUtils.isEmpty(colors)) {
+            stepTextColorsStr = colors.split(",");
+            stepTextColors = stringToColors(colors);
+            stepTextGradient = stringToGradient(colors);
+        }
         draggingEnabled = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_drag, false);
-        String colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_colors);
+        colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_colors);
         if (!TextUtils.isEmpty(colors)) {
             progressColorsStr = colors.split(",");
             progressColors = stringToColors(colors);
@@ -345,6 +365,18 @@ public class JSProgressBar extends View {
                 textPaint.setShader(gradient);
             } else {
                 textPaint.setColor(progressTextColors[0]);
+            }
+        }
+
+        if (stepTextColors.length != 0) {
+            textStepPaint.setShader(null);
+            textStepPaint.setColor(0);
+            if (stepTextColors.length > 2) {
+                LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
+                        stepTextColors, stepTextGradient, Shader.TileMode.REPEAT);
+                textStepPaint.setShader(gradient);
+            } else {
+                textStepPaint.setColor(stepTextColors[0]);
             }
         }
 
@@ -471,15 +503,15 @@ public class JSProgressBar extends View {
         float extra = text.startsWith("1") ? -textPaint.measureText("1") / 2 : 0;
         float offset = 0;
         if (ARC_FULL_DEGREE <= 180) {
-            offset =  h1;
+            offset = h1;
         }
         if (textType == 1 || textType == 2) {
-            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - circleRadius/10 + h1 / 2 - offset, textPaint);
+            canvas.drawText(text, centerX - textLen / 2 + extra, centerY - circleRadius / 10 + h1 / 2 - offset, textPaint);
         }
         if (textType == 1) {
             //百分号
             textPaint.setTextSize(progressTextSize == 0 ? circleRadius >> 2 : progressTextSize);
-            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - circleRadius/10 + h1 / 2 - offset, textPaint);
+            canvas.drawText("%", centerX + textLen / 2 + extra + 5, centerY - circleRadius / 10 + h1 / 2 - offset, textPaint);
         }
 
         //下一行文字
@@ -489,7 +521,7 @@ public class JSProgressBar extends View {
         float h2 = textBounds.height();
 
         if (ARC_FULL_DEGREE <= 180) {
-            offset = h1 / 2 + h2/2;
+            offset = h1 / 2 + h2 / 2;
         }
         canvas.drawText(progressTextHint, centerX - textLen / 2, centerY + h1 / 2 + h2 - offset, textPaint);
 
@@ -532,6 +564,8 @@ public class JSProgressBar extends View {
                 if (checkOnArc(currentX, currentY)) {
                     getParent().requestDisallowInterceptTouchEvent(true);
                     float newProgress = calDegreeByPosition(currentX, currentY) / ARC_FULL_DEGREE * max;
+                    if (steps.length > 0)
+                        step = getProgressStep(newProgress);
                     setProgressSync(newProgress);
                     isDragging = true;
                     if (progressListener != null)
@@ -544,13 +578,17 @@ public class JSProgressBar extends View {
                     //判断拖动时是否移出去了
                     if (checkOnArc(currentX, currentY)) {
                         float currentDegree = calDegreeByPosition(currentX, currentY);
-
+                        float newProgress = 0;
                         if (Math.abs(currentDegree - lastDegree) < 180) {
-                            setProgressSync(currentDegree / ARC_FULL_DEGREE * max);
+                            newProgress = currentDegree / ARC_FULL_DEGREE * max;
+                            setProgressSync(newProgress);
                             lastDegree = currentDegree;
                         } else {
-                            setProgressSync(Math.round(lastDegree / ARC_FULL_DEGREE) >= 1 ? 359 * max : 0);
+                            newProgress = Math.round(lastDegree / ARC_FULL_DEGREE) >= 1 ? 359 * max : 0;
+                            setProgressSync(newProgress);
                         }
+                        if (steps.length > 0)
+                            step = getProgressStep(newProgress);
                         if (progressListener != null)
                             progressListener.dragging(progress, step);
                     } else {//取消状态
@@ -568,7 +606,7 @@ public class JSProgressBar extends View {
         return true;
     }
 
-    public interface JSProgressListener{
+    public interface JSProgressListener {
         void dragging(float progress, float step);
     }
 
@@ -633,7 +671,7 @@ public class JSProgressBar extends View {
         float distance = calDistance(currentX, currentY, centerX, centerY);
         float degree = calDegreeByPosition(currentX, currentY);
         float radius = circleRadius;
-        float width = (STROKE_WIDTH > BUTTON_WIDTH ?STROKE_WIDTH * 10:BUTTON_WIDTH *2);
+        float width = (STROKE_WIDTH > BUTTON_WIDTH ? STROKE_WIDTH * 10 : BUTTON_WIDTH * 2);
         if (ARC_FULL_DEGREE <= 180)
             radius = circleRadius + circleRadius / 2;
         return distance > radius - width && distance < radius + width
@@ -720,6 +758,35 @@ public class JSProgressBar extends View {
         return progress;
     }
 
+    private float getProgressStep(float progress) {
+        float diff;
+        int count = 0;
+        float cent;
+        if (progress >= stepProgress) {
+            count = (int) (progress / stepProgress);
+
+            diff = progress - count * stepProgress;
+            cent = diff / stepProgress;
+
+            if (count >= steps.length) {
+                step = steps[steps.length - 1];
+            } else {
+                step = steps[count - 1] + (steps[count] - steps[count - 1]) * cent;
+            }
+        } else {
+            diff = progress;
+            cent = diff / stepProgress;
+
+            step = steps[count] * cent;
+            if (step < 0) {
+                step = 0f;
+            }
+        }
+
+        step = new BigDecimal(step).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
+        return step;
+    }
+
     //开启拖拽
     public void setDraggingEnabled(boolean draggingEnabled) {
         this.draggingEnabled = draggingEnabled;
@@ -729,6 +796,10 @@ public class JSProgressBar extends View {
     public void setSteps(float... steps) {
         this.steps = steps;
         this.stepProgress = max / steps.length;
+    }
+
+    public Float getStep() {
+        return step;
     }
 
     public float getMax() {

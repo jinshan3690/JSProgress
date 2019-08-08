@@ -22,6 +22,7 @@
             app:js_pb_step_line_length="30dp"
             app:js_pb_step_line_width="5dp"
             app:js_pb_drag="true"
+            app:js_pb_step_text_colors="#ff0000"
             app:js_pb_text_type="percent"
             app:js_pb_text_hint="@string/app_name" />
 

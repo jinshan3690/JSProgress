@@ -19,6 +19,10 @@ public class MainActivity extends AppCompatActivity {
         final JSProgressBar pb2 = findViewById(R.id.pb2);
         final JSProgressBar pb3 = findViewById(R.id.pb3);
         final JSProgressBar pb4 = findViewById(R.id.pb4);
+        pb1.setProgressListener(progressListener);
+        pb2.setProgressListener(progressListener);
+        pb3.setProgressListener(progressListener);
+        pb4.setProgressListener(progressListener);
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,4 +45,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private JSProgressBar.JSProgressListener progressListener = new JSProgressBar.JSProgressListener() {
+        @Override
+        public void dragging(float progress, float step) {
+            MainActivity.this.step = (int) step;
+        }
+    };
+
 }
