@@ -11,20 +11,20 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <com.js.smart.progress.JSProgressBar
-            android:id="@+id/pb4"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:js_pb_steps="5,10,30"
-            app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"
-            app:js_pb_colors="#ff0000,#415382,#EE6911"
-            app:js_pb_degree="90"
-            app:js_pb_step_line_length="30dp"
-            app:js_pb_step_line_width="5dp"
-            app:js_pb_drag="true"
-            app:js_pb_step_text_colors="#ff0000"
-            app:js_pb_text_type="percent"
-            app:js_pb_text_hint="@string/app_name" />
+        <!--<com.js.smart.progress.JSProgressBar-->
+            <!--android:id="@+id/pb4"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="200dp"-->
+            <!--app:js_pb_steps="5,10,30"-->
+            <!--app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"-->
+            <!--app:js_pb_colors="#ff0000,#415382,#EE6911"-->
+            <!--app:js_pb_degree="90"-->
+            <!--app:js_pb_step_line_length="30dp"-->
+            <!--app:js_pb_step_line_width="5dp"-->
+            <!--app:js_pb_drag="true"-->
+            <!--app:js_pb_step_text_colors="#ff0000"-->
+            <!--app:js_pb_text_type="percent"-->
+            <!--app:js_pb_text_hint="@string/app_name" />-->
 
 
         <com.js.smart.progress.JSProgressBar
@@ -39,36 +39,36 @@
             app:js_pb_text_type="progress"
             app:js_pb_text_hint="@string/app_name" />
 
-        <com.js.smart.progress.JSProgressBar
-            android:id="@+id/pb2"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:js_pb_steps="5,10,30"
-            app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"
-            app:js_pb_step_show_start="true"
-            app:js_pb_step_line_length="20dp"
-            app:js_pb_step_line_width="10dp"
-            app:js_pb_color_light="false"
-            app:js_pb_colors="#ff0000,#415382,#EE6911"
-            app:js_pb_drag="true"
-            app:js_pb_round="false"
-            app:js_pb_degree="270"
-            app:js_pb_text_type="progress"
-            app:js_pb_text_colors="#ff0000"
-            app:js_pb_text_hint="@string/app_name" />
+        <!--<com.js.smart.progress.JSProgressBar-->
+            <!--android:id="@+id/pb2"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="200dp"-->
+            <!--app:js_pb_steps="5,10,30"-->
+            <!--app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"-->
+            <!--app:js_pb_step_show_start="true"-->
+            <!--app:js_pb_step_line_length="20dp"-->
+            <!--app:js_pb_step_line_width="10dp"-->
+            <!--app:js_pb_color_light="false"-->
+            <!--app:js_pb_colors="#ff0000,#415382,#EE6911"-->
+            <!--app:js_pb_drag="true"-->
+            <!--app:js_pb_round="false"-->
+            <!--app:js_pb_degree="270"-->
+            <!--app:js_pb_text_type="progress"-->
+            <!--app:js_pb_text_colors="#ff0000"-->
+            <!--app:js_pb_text_hint="@string/app_name" />-->
 
-        <com.js.smart.progress.JSProgressBar
-            android:id="@+id/pb3"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:js_pb_drag="true"
-            app:js_pb_text_type="progress"
-            app:js_pb_max="30"
-            app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"
-            app:js_pb_color_light="false"
-            app:js_pb_colors="#ff0000,#415382,#EE6911"
-            app:js_pb_degree="360"
-            app:js_pb_text_hint="@string/app_name" />
+        <!--<com.js.smart.progress.JSProgressBar-->
+            <!--android:id="@+id/pb3"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="200dp"-->
+            <!--app:js_pb_drag="true"-->
+            <!--app:js_pb_text_type="progress"-->
+            <!--app:js_pb_max="30"-->
+            <!--app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"-->
+            <!--app:js_pb_color_light="false"-->
+            <!--app:js_pb_colors="#ff0000,#415382,#EE6911"-->
+            <!--app:js_pb_degree="360"-->
+            <!--app:js_pb_text_hint="@string/app_name" />-->
 
         <Button
             android:id="@+id/btn1"

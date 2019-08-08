@@ -469,19 +469,19 @@ public class JSProgressBar extends View {
                         step = steps[stepShowStart ? i - 1 : i];
                     String text = new DecimalFormat("###.####").format(step);
                     textStepPaint.setTextSize(stepTextSize == 0 ? circleRadius / 8 : stepTextSize);
-                    float textLen = textPaint.measureText(text);
-                    textStepPaint.getTextBounds(progressTextHint, 0, progressTextHint.length(), textBounds);
+                    float textLen = textStepPaint.measureText(text);
+                    textStepPaint.getTextBounds(text, 0, text.length(), textBounds);
                     float h1 = textBounds.height();
                     if (drawDegree == 0) {
-                        canvas.drawText(text, lineStopX + textLen / 2, lineStopY + h1 / 2, textStepPaint);
+                        canvas.drawText(text, lineStopX, lineStopY + h1 / 2, textStepPaint);
                     } else if (drawDegree == ARC_FULL_DEGREE) {
-                        canvas.drawText(text, lineStopX - textLen - textLen / 2, lineStopY + h1 / 2, textStepPaint);
+                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 / 2, textStepPaint);
                     } else if (drawDegree < ARC_FULL_DEGREE / 2) {
-                        canvas.drawText(text, lineStopX, lineStopY + h1 + h1 / 2, textStepPaint);
+                        canvas.drawText(text, lineStopX, lineStopY + h1, textStepPaint);
                     } else if (drawDegree > ARC_FULL_DEGREE / 2) {
-                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1 + h1 / 2, textStepPaint);
+                        canvas.drawText(text, lineStopX - textLen, lineStopY + h1, textStepPaint);
                     } else {
-                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1 + h1 / 2, textStepPaint);
+                        canvas.drawText(text, lineStopX - textLen / 2, lineStopY + h1, textStepPaint);
                     }
                 }
 
