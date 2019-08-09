@@ -612,6 +612,7 @@ public class JSProgressBar extends View {
 
     public interface JSProgressListener {
         void dragging(float progress, float step);
+        void change(float progress, float step);
     }
 
     /**
@@ -710,6 +711,7 @@ public class JSProgressBar extends View {
         if (valueAnimator != null && valueAnimator.isStarted()) {
             valueAnimator.cancel();
         }
+
         float diff = per - progress;
         valueAnimator = ValueAnimator
                 .ofFloat(progress, progress + diff)
@@ -738,12 +740,18 @@ public class JSProgressBar extends View {
     public void setProgress(float progress) {
         final float validProgress = checkProgress(progress);
 
+        if (progressListener != null)
+            progressListener.change(validProgress, step == null ? 0f : step);
+
         startAnimation(validProgress);
     }
 
     //设置进度
     public void setProgressSync(float progress) {
         this.progress = new BigDecimal(checkProgress(progress)).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
+
+        if (progressListener != null)
+            progressListener.change(this.progress, step == null ? 0f : step);
         invalidate();
     }
 
