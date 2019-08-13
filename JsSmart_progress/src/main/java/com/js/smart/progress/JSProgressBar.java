@@ -886,6 +886,10 @@ public class JSProgressBar extends View {
         return progress;
     }
 
+    public void setProgressColor(int progressColor) {
+        progressPaint.setColor(getResources().getColor(progressColor));
+    }
+
     public JSProgressListener getProgressListener() {
         return progressListener;
     }

@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 //                pb2.setProgressStep(step);
 //                pb3.setProgress(step);
 //                pb4.setProgressStep(step);
+                pb1.setProgressColor(R.color.colorPrimary);
 
             }
         });
