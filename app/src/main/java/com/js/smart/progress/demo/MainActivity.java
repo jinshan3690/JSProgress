@@ -51,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
         public void dragging(float progress, float step) {
             MainActivity.this.step = (int) step;
         }
+
+        @Override
+        public void change(float progress, float step) {
+
+        }
     };
 
 }

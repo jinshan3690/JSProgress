@@ -75,13 +75,21 @@ public class JSProgressBar extends View {
     /**
      * 进度条颜色
      */
-    private String[] stepTextColorsStr = new String[0];
+    private String[] stepColorsStr = new String[0];
     /**
      * 进度条颜色
      */
+    private int[] stepColors = new int[0];
+    /**
+     * 进度条文字颜色
+     */
+    private String[] stepTextColorsStr = new String[0];
+    /**
+     * 进度条文字颜色
+     */
     private int[] stepTextColors = new int[0];
     /**
-     * 进度条颜色梯度
+     * 进度条文字颜色梯度
      */
     private float[] stepTextGradient = new float[0];
     /**
@@ -249,7 +257,12 @@ public class JSProgressBar extends View {
         stepShowStart = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_step_show_start, false);
         stepShowText = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_step_show_text, true);
         stepTextSize = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_step_text_size, 0);
-        String colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_step_text_colors);
+        String colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_step_colors);
+        if (!TextUtils.isEmpty(colors)) {
+            stepColorsStr = colors.split(",");
+            stepColors = stringToColors(colors);
+        }
+        colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_step_text_colors);
         if (!TextUtils.isEmpty(colors)) {
             stepTextColorsStr = colors.split(",");
             stepTextColors = stringToColors(colors);
@@ -330,7 +343,11 @@ public class JSProgressBar extends View {
         thumbPaint = new Paint();
         thumbPaint.setAntiAlias(true);
 
-        if (progressColors.length != 0)
+
+        if (stepColors.length != 0) {
+            progressPaint.setColor(stepColors[0]);
+            textPaint.setColor(stepColors[0]);
+        }else if (progressColors.length != 0)
             if (progressColors.length > 2) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressColors, progressGradient, Shader.TileMode.REPEAT);
@@ -343,7 +360,7 @@ public class JSProgressBar extends View {
             }
 
 
-        if (progressBackgroundColors.length != 0)
+        if (progressBackgroundColors.length != 0) {
             if (progressBackgroundColors.length > 2) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressBackgroundColors, progressBackgroundGradient, Shader.TileMode.REPEAT);
@@ -356,6 +373,7 @@ public class JSProgressBar extends View {
                 progressBackgroundPaint.setColor(progressBackgroundColors[0]);
                 textStepPaint.setColor(progressBackgroundColors[0]);
             }
+        }
 
         if (progressTextColors.length != 0) {
             textPaint.setShader(null);
@@ -612,6 +630,7 @@ public class JSProgressBar extends View {
 
     public interface JSProgressListener {
         void dragging(float progress, float step);
+
         void change(float progress, float step);
     }
 
@@ -740,6 +759,17 @@ public class JSProgressBar extends View {
     public void setProgress(float progress) {
         final float validProgress = checkProgress(progress);
 
+        if(stepColors.length >0) {
+            for (int i = 0; i < steps.length; i++) {
+                if(steps[i] > step){
+                    progressPaint.setColor(stepColors[i]);
+                    break;
+                }else if(steps[steps.length -1] <= step){
+                    progressPaint.setColor(stepColors[stepColors.length - 1]);
+                }
+            }
+        }
+
         if (progressListener != null)
             progressListener.change(validProgress, step == null ? 0f : step);
 
@@ -750,6 +780,16 @@ public class JSProgressBar extends View {
     public void setProgressSync(float progress) {
         this.progress = new BigDecimal(checkProgress(progress)).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
 
+        if(stepColors.length >0) {
+            for (int i = 0; i < steps.length; i++) {
+                if(steps[i] > step){
+                    progressPaint.setColor(stepColors[i]);
+                    break;
+                }else if(steps[steps.length -1] <= step){
+                    progressPaint.setColor(stepColors[stepColors.length - 1]);
+                }
+            }
+        }
         if (progressListener != null)
             progressListener.change(this.progress, step == null ? 0f : step);
         invalidate();

@@ -33,6 +33,7 @@
             android:layout_height="200dp"
             app:js_pb_step_show_start="true"
             app:js_pb_steps="5,10,30,50,80,90"
+            app:js_pb_step_colors="#51b6ff,#62dca2,#fd3445,#ffffff,#000000,#51b6ff,#62dca2"
             app:js_pb_background_colors="#40ff0000,#40415382,#40EE6911"
             app:js_pb_colors="#ff0000,#415382,#EE6911"
             app:js_pb_drag="true"
