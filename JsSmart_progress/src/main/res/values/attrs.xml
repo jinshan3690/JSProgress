@@ -18,6 +18,8 @@
         <attr name="js_pb_step_text_colors" format="string|reference" />
         <attr name="js_pb_step_colors" format="string|reference" />
         <attr name="js_pb_drag" format="boolean|reference" />
+        <attr name="js_pb_drag_ico" format="reference" />
+        <attr name="js_pb_drag_color" format="color|reference" />
         <attr name="js_pb_colors" format="string|reference" />
         <attr name="js_pb_background_colors" format="string|reference" />
         <attr name="js_pb_text_type" format="enum">

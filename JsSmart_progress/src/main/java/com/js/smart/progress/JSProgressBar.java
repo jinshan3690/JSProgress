@@ -4,17 +4,26 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Xfermode;
+import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -219,6 +228,18 @@ public class JSProgressBar extends View {
      */
     private int centerX, centerY;
     /**
+     * 拖拽时按钮颜色
+     */
+    private int dragColor;
+    /**
+     * 拖拽时提示的图标
+     */
+    private Bitmap dragIco;
+    /**
+     * 拖拽时提示的图标偏移
+     */
+    private float dragIcoOffset;
+    /**
      * 是否拖拽
      */
     private boolean isDragging = false;
@@ -244,6 +265,11 @@ public class JSProgressBar extends View {
         ARC_FULL_DEGREE = typedArray.getInteger(R.styleable.JSProgressBar_js_pb_degree, 180);
         STROKE_WIDTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_stroke_width, 0);
         BUTTON_WIDTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_button_width, 0);
+        int drawable = typedArray.getResourceId(R.styleable.JSProgressBar_js_pb_drag_ico, 0);
+        if (drawable != 0) {
+            dragIco = BitmapFactory.decodeResource(getResources(), drawable);
+        }
+        dragColor = typedArray.getColor(R.styleable.JSProgressBar_js_pb_drag_color, 0);
         OFFSET_TOP = (int) typedArray.getDimension(R.styleable.JSProgressBar_js_pb_offset_top, 0);
         max = typedArray.getInteger(R.styleable.JSProgressBar_js_pb_max, 100);
         progress = typedArray.getInteger(R.styleable.JSProgressBar_js_pb_progress, 0);
@@ -343,20 +369,25 @@ public class JSProgressBar extends View {
         thumbPaint = new Paint();
         thumbPaint.setAntiAlias(true);
 
-
         if (stepColors.length != 0) {
             progressPaint.setColor(stepColors[0]);
             textPaint.setColor(stepColors[0]);
-        }else if (progressColors.length != 0)
+            if(dragColor == 0)
+                dragColor = stepColors[0];
+        } else if (progressColors.length != 0)
             if (progressColors.length > 2) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressColors, progressGradient, Shader.TileMode.REPEAT);
 
                 progressPaint.setShader(gradient);
                 textPaint.setShader(gradient);
+                if(dragColor == 0)
+                    dragColor = progressColors[0];
             } else {
                 progressPaint.setColor(progressColors[0]);
                 textPaint.setColor(progressColors[0]);
+                if(dragColor == 0)
+                    dragColor = progressColors[0];
             }
 
 
@@ -413,6 +444,7 @@ public class JSProgressBar extends View {
 
             //计算圆弧半径和圆心点
             circleRadius = Math.min(width, height) / 2;
+
             if (STROKE_WIDTH == 0)
                 STROKE_WIDTH = circleRadius / 12;
             if (BUTTON_WIDTH == 0)
@@ -423,6 +455,20 @@ public class JSProgressBar extends View {
                 STEP_LINE_WIDTH = STEP_LINE_LENGTH / 8;
             if (STEP_LINE_OFFSET == 0)
                 STEP_LINE_OFFSET = STROKE_WIDTH;
+
+            if (dragIco != null) {
+                float icoWidth = (BUTTON_WIDTH == 0 ? STROKE_WIDTH * 2.0f : BUTTON_WIDTH * 1.0f);
+                dragIcoOffset = icoWidth / 2;
+                OFFSET_TOP += icoWidth + dragIcoOffset;
+
+                circleRadius = (Math.min(width, height) - OFFSET_TOP) / 2;
+
+                STROKE_WIDTH = circleRadius / 12;
+                BUTTON_WIDTH = STROKE_WIDTH * 2.0f;
+                STEP_LINE_LENGTH = circleRadius / 6;
+                STEP_LINE_WIDTH = STEP_LINE_LENGTH / 8;
+                STEP_LINE_OFFSET = STROKE_WIDTH;
+            }
 
             circleRadius -= BUTTON_WIDTH > STROKE_WIDTH ? BUTTON_WIDTH : STROKE_WIDTH;
 
@@ -436,7 +482,7 @@ public class JSProgressBar extends View {
             circleRectF.right = centerX + circleRadius;
             circleRectF.bottom = centerY + circleRadius;
             if (ARC_FULL_DEGREE <= 180) {
-                centerY += height / 4;
+                centerY += circleRadius/1.4;
                 circleRectF.top = centerY - circleRadius - circleRadius / 2;
                 circleRectF.bottom = centerY + circleRadius + circleRadius / 2;
                 circleRectF.right = centerX + circleRadius + circleRadius / 2;
@@ -553,12 +599,38 @@ public class JSProgressBar extends View {
                 thumbX = centerX - (circleRadius + circleRadius / 2) * (float) Math.sin(progressRadians);
                 thumbY = centerY + (circleRadius + circleRadius / 2) * (float) Math.cos(progressRadians);
             }
-            thumbPaint.setColor(getThumbColor(33));
+            thumbPaint.setColor(dragColor);
+            thumbPaint.setAlpha(33);
             canvas.drawCircle(thumbX, thumbY, BUTTON_WIDTH == 0 ? STROKE_WIDTH * 2.0f : BUTTON_WIDTH * 1.0f, thumbPaint);
-            thumbPaint.setColor(getThumbColor(99));
+            thumbPaint.setColor(dragColor);
+            thumbPaint.setAlpha(99);
             canvas.drawCircle(thumbX, thumbY, BUTTON_WIDTH == 0 ? STROKE_WIDTH * 1.4f : BUTTON_WIDTH * 0.7f, thumbPaint);
             thumbPaint.setColor(Color.WHITE);
+            thumbPaint.setAlpha(255);
             canvas.drawCircle(thumbX, thumbY, BUTTON_WIDTH == 0 ? STROKE_WIDTH * 0.8f : BUTTON_WIDTH * 0.4f, thumbPaint);
+
+            if (dragIco != null && isDragging) {//绘制提示
+                float hintWidth = BUTTON_WIDTH == 0 ? STROKE_WIDTH * 2.0f : BUTTON_WIDTH * 1.0f;
+                float hintY = thumbY - (BUTTON_WIDTH == 0 ? STROKE_WIDTH * 2.0f : BUTTON_WIDTH * 1.0f);
+
+                Rect rect = new Rect((int) (thumbX - hintWidth),
+                        (int) (hintY - hintWidth * 2f - dragIcoOffset),
+                        (int) (thumbX + hintWidth),
+                        (int) (hintY - dragIcoOffset));
+
+                canvas.drawBitmap(resizeBitmap(dragIco, (int) hintWidth * 2, (int) hintWidth * 2), null, rect, new Paint());
+                thumbPaint.setColor(Color.WHITE);
+                thumbPaint.setTextSize(circleRadius / 8);
+                text = (int) (100 * progress / max) + "";
+                if (textType == 2) {
+                    text = step != null ? String.valueOf(step) : String.valueOf(progress);
+                }
+                textLen = thumbPaint.measureText(text);
+                thumbPaint.getTextBounds(text, 0, text.length(), textBounds);
+                int h3 = textBounds.height();
+                canvas.drawText(text, thumbX - textLen / 2,
+                        hintY - hintWidth - dragIcoOffset + h3 / 2, thumbPaint);
+            }
         }
     }
 
@@ -621,6 +693,7 @@ public class JSProgressBar extends View {
 
             case MotionEvent.ACTION_UP:
                 isDragging = false;
+                invalidate();
                 getParent().requestDisallowInterceptTouchEvent(false);
                 break;
         }
@@ -637,17 +710,21 @@ public class JSProgressBar extends View {
     /**
      * 计算
      */
-    //按钮颜色
-    private int getThumbColor(int alpha) {
-        if (progressColorsStr.length > 0) {
-            String color = progressColorsStr[0];
-            if (color.length() > 7) {
-                color = String.format("#%s", color.substring(3));
-            }
-            color = color.replace("#", "#" + alpha);
-            return Color.parseColor(color);
+    public Bitmap resizeBitmap(Bitmap bitmap, int w, int h) {
+        if (bitmap != null) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            int newWidth = w;
+            int newHeight = h;
+            float scaleWight = ((float) newWidth) / width;
+            float scaleHeight = ((float) newHeight) / height;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWight, scaleHeight);
+            Bitmap res = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+            return res;
+
         } else {
-            return 0;
+            return null;
         }
     }
 
@@ -759,12 +836,12 @@ public class JSProgressBar extends View {
     public void setProgress(float progress) {
         final float validProgress = checkProgress(progress);
 
-        if(stepColors.length >0) {
+        if (stepColors.length > 0) {
             for (int i = 0; i < steps.length; i++) {
-                if(steps[i] > step){
+                if (steps[i] > step) {
                     progressPaint.setColor(stepColors[i]);
                     break;
-                }else if(steps[steps.length -1] <= step){
+                } else if (steps[steps.length - 1] <= step) {
                     progressPaint.setColor(stepColors[stepColors.length - 1]);
                 }
             }
@@ -780,12 +857,12 @@ public class JSProgressBar extends View {
     public void setProgressSync(float progress) {
         this.progress = new BigDecimal(checkProgress(progress)).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
 
-        if(stepColors.length >0) {
+        if (stepColors.length > 0) {
             for (int i = 0; i < steps.length; i++) {
-                if(steps[i] > step){
+                if (steps[i] > step) {
                     progressPaint.setColor(stepColors[i]);
                     break;
-                }else if(steps[steps.length -1] <= step){
+                } else if (steps[steps.length - 1] <= step) {
                     progressPaint.setColor(stepColors[stepColors.length - 1]);
                 }
             }
@@ -896,5 +973,49 @@ public class JSProgressBar extends View {
 
     public void setProgressListener(JSProgressListener progressListener) {
         this.progressListener = progressListener;
+    }
+
+    public void setMax(float max) {
+        this.max = max;
+    }
+
+    public void setStepShowStart(boolean stepShowStart) {
+        this.stepShowStart = stepShowStart;
+    }
+
+    public void setStepShowText(boolean stepShowText) {
+        this.stepShowText = stepShowText;
+    }
+
+    public void setStepTextSize(float stepTextSize) {
+        this.stepTextSize = stepTextSize;
+    }
+
+    public void setProgressLight(boolean progressLight) {
+        this.progressLight = progressLight;
+    }
+
+    public void setProgressRound(boolean progressRound) {
+        this.progressRound = progressRound;
+    }
+
+    public void setProgressTextSize(float progressTextSize) {
+        this.progressTextSize = progressTextSize;
+    }
+
+    public void setProgressTextHintSize(float progressTextHintSize) {
+        this.progressTextHintSize = progressTextHintSize;
+    }
+
+    public void setDragIco(Bitmap dragIco) {
+        this.dragIco = dragIco;
+    }
+
+    public void setDragColor(int dragColor) {
+        this.dragColor = getResources().getColor(dragColor);
+    }
+
+    public void setDragIcoOffset(float dragIcoOffset) {
+        this.dragIcoOffset = dragIcoOffset;
     }
 }
