@@ -600,10 +600,10 @@ public class JSProgressBar extends View {
                 thumbY = centerY + (circleRadius + circleRadius / 2) * (float) Math.cos(progressRadians);
             }
             thumbPaint.setColor(dragColor);
-            thumbPaint.setAlpha(33);
+            thumbPaint.setAlpha(85);
             canvas.drawCircle(thumbX, thumbY, BUTTON_WIDTH == 0 ? STROKE_WIDTH * 2.0f : BUTTON_WIDTH * 1.0f, thumbPaint);
             thumbPaint.setColor(dragColor);
-            thumbPaint.setAlpha(99);
+            thumbPaint.setAlpha(140);
             canvas.drawCircle(thumbX, thumbY, BUTTON_WIDTH == 0 ? STROKE_WIDTH * 1.4f : BUTTON_WIDTH * 0.7f, thumbPaint);
             thumbPaint.setColor(Color.WHITE);
             thumbPaint.setAlpha(255);
