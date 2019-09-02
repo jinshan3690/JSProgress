@@ -504,10 +504,10 @@ public class JSProgressBar extends View {
         float sweep1 = ARC_FULL_DEGREE * (progress / max); //进度划过的角度
         float sweep2 = ARC_FULL_DEGREE - sweep1; //剩余的角度
 
-        //绘制进度条
-        canvas.drawArc(circleRectF, start, sweep1, false, progressPaint);
         //绘制进度条背景
         canvas.drawArc(circleRectF, start + sweep1, sweep2, false, progressBackgroundPaint);
+        //绘制进度条
+        canvas.drawArc(circleRectF, start, sweep1, false, progressPaint);
 
         //绘制分段
         if (steps.length > 0) {
