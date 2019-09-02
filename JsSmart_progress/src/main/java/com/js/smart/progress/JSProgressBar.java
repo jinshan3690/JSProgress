@@ -429,7 +429,8 @@ public class JSProgressBar extends View {
                 textStepPaint.setColor(stepTextColors[0]);
             }
         }
-
+        //关闭硬件加速
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     /**
