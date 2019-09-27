@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
         final JSProgressBar pb2 = findViewById(R.id.pb2);
         final JSProgressBar pb3 = findViewById(R.id.pb3);
         final JSProgressBar pb4 = findViewById(R.id.pb4);
+//        pb1.setProgressStep(90);
         pb1.setProgressListener(progressListener);
         pb2.setProgressListener(progressListener);
         pb3.setProgressListener(progressListener);
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 step --;
-                pb1.setProgressStep(step);
+                pb1.setProgressSync(pb1.getProgress());
                 pb2.setProgressStep(step);
                 pb3.setProgress(step);
                 pb4.setProgressStep(step);

@@ -856,6 +856,9 @@ public class JSProgressBar extends View {
 
     //设置进度
     public void setProgressSync(float progress) {
+        if (valueAnimator != null && valueAnimator.isStarted()) {
+            valueAnimator.cancel();
+        }
         this.progress = new BigDecimal(checkProgress(progress)).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
 
         if (stepColors.length > 0) {
@@ -894,6 +897,10 @@ public class JSProgressBar extends View {
     }
 
     public float setProgressStepSync(float step) {
+        if (valueAnimator != null && valueAnimator.isStarted()) {
+            valueAnimator.cancel();
+        }
+
         this.step = step;
         float progress = 0;
         for (int i = 0; i < steps.length; i++) {
