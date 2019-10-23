@@ -118,6 +118,7 @@ public class JSProgressBar extends View {
      * 是否允许拖动进度条
      */
     private boolean draggingEnabled;
+    private boolean draggingShow;
     /**
      * 进度条颜色
      */
@@ -298,6 +299,7 @@ public class JSProgressBar extends View {
             stepTextGradient = stringToGradient(colors);
         }
         draggingEnabled = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_drag, false);
+        draggingShow = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_drag_show, draggingEnabled);
         colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_colors);
         if (!TextUtils.isEmpty(colors)) {
             progressColorsStr = colors.split(",");
@@ -606,7 +608,7 @@ public class JSProgressBar extends View {
         canvas.drawText(progressTextHint, centerX - textLen / 2, centerY + h1 / 2 + h2 - offset, textPaint);
 
         //绘制进度位置，也可以直接替换成一张图片
-        if (draggingEnabled) {
+        if (draggingShow) {
             float progressRadians = (float) (((360.0f - ARC_FULL_DEGREE) / 2 + sweep1) / 180 * Math.PI);
             float thumbX = centerX - circleRadius * (float) Math.sin(progressRadians);
             float thumbY = centerY + circleRadius * (float) Math.cos(progressRadians);
