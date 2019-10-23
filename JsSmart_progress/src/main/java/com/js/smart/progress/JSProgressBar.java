@@ -389,7 +389,7 @@ public class JSProgressBar extends View {
             if (dragColor == 0)
                 dragColor = stepColors[0];
         } else if (progressColors.length != 0)
-            if (progressColors.length > 2) {
+            if (progressColors.length > 1) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressColors, progressGradient, Shader.TileMode.REPEAT);
 
@@ -406,7 +406,7 @@ public class JSProgressBar extends View {
 
 
         if (progressBackgroundColors.length != 0) {
-            if (progressBackgroundColors.length > 2) {
+            if (progressBackgroundColors.length > 1) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressBackgroundColors, progressBackgroundGradient, Shader.TileMode.REPEAT);
 
@@ -423,7 +423,7 @@ public class JSProgressBar extends View {
         if (progressTextColors.length != 0) {
             textPaint.setShader(null);
             textPaint.setColor(0);
-            if (progressTextColors.length > 2) {
+            if (progressTextColors.length > 1) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         progressTextColors, progressTextGradient, Shader.TileMode.REPEAT);
                 textPaint.setShader(gradient);
@@ -435,7 +435,7 @@ public class JSProgressBar extends View {
         if (stepTextColors.length != 0) {
             textStepPaint.setShader(null);
             textStepPaint.setColor(0);
-            if (stepTextColors.length > 2) {
+            if (stepTextColors.length > 1) {
                 LinearGradient gradient = new LinearGradient(STROKE_WIDTH / 2f, OFFSET_TOP, STROKE_WIDTH / 2f, height + OFFSET_TOP,
                         stepTextColors, stepTextGradient, Shader.TileMode.REPEAT);
                 textStepPaint.setShader(gradient);
