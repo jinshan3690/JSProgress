@@ -22,6 +22,8 @@
         <attr name="js_pb_drag_color" format="color|reference" />
         <attr name="js_pb_colors" format="string|reference" />
         <attr name="js_pb_background_colors" format="string|reference" />
+        <attr name="js_pb_background_stroke_color" format="color|reference" />
+        <attr name="js_pb_background_stroke_width" format="dimension|reference" />
         <attr name="js_pb_text_type" format="enum">
             <enum name="percent" value="1" />
             <enum name="progress" value="2" />

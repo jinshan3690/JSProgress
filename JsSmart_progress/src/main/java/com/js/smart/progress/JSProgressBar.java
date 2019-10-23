@@ -45,6 +45,7 @@ public class JSProgressBar extends View {
      * 弧线的宽度
      */
     private float STROKE_WIDTH;
+    private float PROGRESS_STROKE_WIDTH;
     /**
      * 按钮的宽度
      */
@@ -145,6 +146,7 @@ public class JSProgressBar extends View {
      * 进度条颜色
      */
     private int[] progressBackgroundColors = new int[0];
+    private int progressBackgroundStrokeColor;
 
     /**
      * 进度条颜色梯度
@@ -207,6 +209,7 @@ public class JSProgressBar extends View {
      * 绘制弧线背景的画笔
      */
     private Paint progressBackgroundPaint;
+    private Paint progressBackgroundStrokePaint;
     /**
      * 绘制文字的画笔
      */
@@ -304,6 +307,8 @@ public class JSProgressBar extends View {
         progressLight = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_color_light, true);
         progressRound = typedArray.getBoolean(R.styleable.JSProgressBar_js_pb_round, true);
         colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_background_colors);
+        progressBackgroundStrokeColor = typedArray.getColor(R.styleable.JSProgressBar_js_pb_background_stroke_color, 0);
+        PROGRESS_STROKE_WIDTH = typedArray.getDimension(R.styleable.JSProgressBar_js_pb_background_stroke_width, 0);
         if (!TextUtils.isEmpty(colors)) {
             progressBackgroundColorsStr = colors.split(",");
             progressBackgroundColors = stringToColors(colors);
@@ -348,6 +353,13 @@ public class JSProgressBar extends View {
         progressBackgroundPaint.setStrokeWidth(STROKE_WIDTH);
         progressBackgroundPaint.setStrokeCap(progressRound ? Paint.Cap.ROUND : Paint.Cap.SQUARE);
 
+        progressBackgroundStrokePaint = new Paint();
+        progressBackgroundStrokePaint.setAntiAlias(true);
+        progressBackgroundStrokePaint.setStyle(Paint.Style.STROKE);
+        progressBackgroundStrokePaint.setStrokeWidth(STROKE_WIDTH + PROGRESS_STROKE_WIDTH);
+        progressBackgroundStrokePaint.setStrokeCap(progressRound ? Paint.Cap.ROUND : Paint.Cap.SQUARE);
+        progressBackgroundStrokePaint.setColor(progressBackgroundStrokeColor);
+
         //分段画笔
         stepProgressPaint = new Paint();
         stepProgressPaint.setAntiAlias(true);
@@ -372,7 +384,7 @@ public class JSProgressBar extends View {
         if (stepColors.length != 0) {
             progressPaint.setColor(stepColors[0]);
             textPaint.setColor(stepColors[0]);
-            if(dragColor == 0)
+            if (dragColor == 0)
                 dragColor = stepColors[0];
         } else if (progressColors.length != 0)
             if (progressColors.length > 2) {
@@ -381,12 +393,12 @@ public class JSProgressBar extends View {
 
                 progressPaint.setShader(gradient);
                 textPaint.setShader(gradient);
-                if(dragColor == 0)
+                if (dragColor == 0)
                     dragColor = progressColors[0];
             } else {
                 progressPaint.setColor(progressColors[0]);
                 textPaint.setColor(progressColors[0]);
-                if(dragColor == 0)
+                if (dragColor == 0)
                     dragColor = progressColors[0];
             }
 
@@ -483,7 +495,7 @@ public class JSProgressBar extends View {
             circleRectF.right = centerX + circleRadius;
             circleRectF.bottom = centerY + circleRadius;
             if (ARC_FULL_DEGREE <= 180) {
-                centerY += circleRadius/1.4;
+                centerY += circleRadius / 1.4;
                 circleRectF.top = centerY - circleRadius - circleRadius / 2;
                 circleRectF.bottom = centerY + circleRadius + circleRadius / 2;
                 circleRectF.right = centerX + circleRadius + circleRadius / 2;
@@ -506,6 +518,8 @@ public class JSProgressBar extends View {
         float sweep2 = ARC_FULL_DEGREE - sweep1; //剩余的角度
 
         //绘制进度条背景
+        if (PROGRESS_STROKE_WIDTH != 0 && progressBackgroundStrokeColor != 0)
+            canvas.drawArc(circleRectF, start + sweep1, sweep2, false, progressBackgroundStrokePaint);
         canvas.drawArc(circleRectF, start + sweep1, sweep2, false, progressBackgroundPaint);
         //绘制进度条
         canvas.drawArc(circleRectF, start, sweep1, false, progressPaint);
