@@ -181,6 +181,10 @@ public class JSProgressBar extends View {
      * 进度条提示文字大小
      */
     private float progressTextHintSize;
+    /**
+     * 进度条文字保留位数
+     */
+    private int progressTextReserveDecimal;
 
     /**
      * 组件的宽，高
@@ -316,6 +320,7 @@ public class JSProgressBar extends View {
             progressBackgroundColors = stringToColors(colors);
             progressBackgroundGradient = stringToGradient(colors);
         }
+        progressTextReserveDecimal = typedArray.getInteger(R.styleable.JSProgressBar_js_pb_text_reserve_decimal, 1);
         colors = typedArray.getString(R.styleable.JSProgressBar_js_pb_text_colors);
         if (!TextUtils.isEmpty(colors)) {
             progressTextColorsStr = colors.split(",");
@@ -577,6 +582,9 @@ public class JSProgressBar extends View {
         if (textType == 2) {
             text = step != null ? String.valueOf(step) : String.valueOf(progress);
         }
+        if (progressTextReserveDecimal == 0) {
+            text = new DecimalFormat("###.####").format(Float.valueOf(text));
+        }
         float textLen = textPaint.measureText(text);
         //计算文字高度
         textPaint.getTextBounds("8", 0, 1, textBounds);
@@ -832,7 +840,10 @@ public class JSProgressBar extends View {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                progress = new BigDecimal((float) animation.getAnimatedValue()).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
+                progress = new BigDecimal((float) animation.getAnimatedValue()).setScale(progressTextReserveDecimal, BigDecimal.ROUND_HALF_UP).floatValue();
+                if (progressTextReserveDecimal == 0) {
+                    progress = Float.valueOf(new DecimalFormat("###.####").format(progress));
+                }
                 invalidate();
             }
         });
@@ -875,7 +886,10 @@ public class JSProgressBar extends View {
         if (valueAnimator != null && valueAnimator.isStarted()) {
             valueAnimator.cancel();
         }
-        this.progress = new BigDecimal(checkProgress(progress)).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
+        this.progress = new BigDecimal(checkProgress(progress)).setScale(progressTextReserveDecimal, BigDecimal.ROUND_HALF_UP).floatValue();
+        if (progressTextReserveDecimal == 0) {
+            this.progress = Float.valueOf(new DecimalFormat("###.####").format(this.progress));
+        }
 
         if (stepColors.length > 0) {
             for (int i = 0; i < steps.length; i++) {
@@ -960,7 +974,11 @@ public class JSProgressBar extends View {
             }
         }
 
-        step = new BigDecimal(step).setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
+        step = new BigDecimal(step).setScale(progressTextReserveDecimal, BigDecimal.ROUND_HALF_UP).floatValue();
+        if (progressTextReserveDecimal == 0) {
+            step = Float.valueOf(new DecimalFormat("###.####").format(step));
+        }
+
         return step;
     }
 

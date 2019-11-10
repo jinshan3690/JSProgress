@@ -31,6 +31,7 @@
             android:id="@+id/pb1"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            app:js_pb_text_reserve_decimal="0"
             app:js_pb_step_show_start="true"
             app:js_pb_steps="5,10,30,50,80,90"
             app:js_pb_step_colors="#51b6ff,#62dca2,#fd3445,#ffffff,#000000,#51b6ff,#62dca2"
